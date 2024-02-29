@@ -1,25 +1,36 @@
 import json
-from pathlib import Path
-
-
 def extract_route(string):
-    return string.split()[1][1:]
+    #route = string.split('/', 1)[1].split(' ', 1)[0]
+    route = string.split()[1][1:]
+    return route
 
-def read_file(file_path):
-    with open(file_path, 'r') as file:
-            content = file.read()
-            return content
-    
-def load_data(filename):
-    data_dir = Path("data")
-    json_file_path = data_dir / filename
-   
-    with open(json_file_path, "r") as file:
+def read_file(path):
+    with open(path, 'rb') as file:
+        content = file.read()
+    return content
+
+def load_data(file_name):
+    with open("data/" + file_name, 'r') as file:
         data = json.load(file)
-        return data
-    
-def load_template(template_name):
-    with open(template_name, "r") as file:
-        template_content = file.read()
-        return template_content
-     
+    return data
+
+def load_template(file_name):
+    with open("templates/" + file_name, 'r') as file:
+        template = file.read()
+    return template
+
+def add_note(note):
+    with open("data/notes.json", 'r+') as file:
+        data = json.load(file)
+        data.append(note)
+        file.seek(0)
+        json.dump(data, file, indent=4)
+        file.truncate()
+
+
+def build_response(body='', code=200, reason='OK', headers=''):
+    if headers == '':
+        response = f'HTTP/1.1 {code} {reason}\n\n{body}'
+    else:
+        response = f'HTTP/1.1 {code} {reason}\n{headers}\n\n{body}'
+    return response.encode()
